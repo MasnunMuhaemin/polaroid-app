@@ -19,6 +19,7 @@ class OrderController extends Controller
         
         try {
             $validated = $request->validate([
+                'order_code' => 'nullable|string|unique:orders,order_code',
                 'name' => 'required|string',
                 'phone' => 'required|string',
                 'address' => 'required|string',
@@ -32,7 +33,7 @@ class OrderController extends Controller
             return redirect()->back()->withErrors($e->errors());
         }
 
-        $orderCode = 'POL-' . strtoupper(Str::random(6));
+        $orderCode = $request->order_code ?? ('POL-' . strtoupper(Str::random(6)));
 
         try {
             // Save PDF File

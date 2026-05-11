@@ -195,6 +195,10 @@ export default function CanvasEditor() {
         if (photos.length === 0) return;
         setIsSaving(true);
 
+        // Generate Order Code on client so we can put it in PDF and Text
+        const clientOrderCode = 'POL-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        const totalPages = Math.max(sheets, Math.ceil(photos.length / gridSlots.length));
+
         try {
             const pdf = new jsPDF({
                 orientation: baseCanvas.mediaWidth > baseCanvas.mediaHeight ? "l" : "p",
@@ -202,24 +206,48 @@ export default function CanvasEditor() {
                 format: [baseCanvas.mediaWidth / 10, baseCanvas.mediaHeight / 10],
             });
 
-            for (let i = 0; i < stageRefs.current.length; i++) {
+            for (let i = 0; i < totalPages; i++) {
                 const stage = stageRefs.current[i];
                 if (!stage) continue;
+                
                 const guideLayer = stage.findOne("#guide-layer");
+                const uiLayer = stage.findOne("#ui-layer");
+                const textLayer = stage.findOne("#text-layer");
+                
+                // Update text for this specific page before capturing
+                if (textLayer) {
+                    const infoText = textLayer.findOne("Text");
+                    if (infoText) {
+                        infoText.text([
+                            `ID: ${clientOrderCode}`,
+                            `Nama: ${userName}`,
+                            `Ukuran: ${paperSize}`,
+                            `Halaman: ${i + 1} dari ${totalPages}`
+                        ].filter(Boolean).join("  |  "));
+                    }
+                }
+
                 if (guideLayer) guideLayer.hide();
+                if (uiLayer) uiLayer.hide();
+                
                 stage.draw();
-                const uri = stage.toDataURL({ pixelRatio: 2 });
+                // Increase pixelRatio to 4 for ultra-high resolution printing
+                const uri = stage.toDataURL({ pixelRatio: 4 }); 
+                
                 if (guideLayer) guideLayer.show();
+                if (uiLayer) uiLayer.show();
+                
                 stage.draw();
                 if (i > 0) pdf.addPage();
-                pdf.addImage(uri, "PNG", 0, 0, baseCanvas.mediaWidth / 10, baseCanvas.mediaHeight / 10);
+                pdf.addImage(uri, "PNG", 0, 0, baseCanvas.mediaWidth / 10, baseCanvas.mediaHeight / 10, undefined, 'FAST');
             }
 
-            const fileName = `Order_${userName.replace(/\s+/g, "_") || "Pelanggan"}.pdf`;
+            const fileName = `${clientOrderCode}_${userName.replace(/\s+/g, "_") || "Pelanggan"}.pdf`;
             const pdfBlob = pdf.output("blob");
             const pdfFile = new File([pdfBlob], fileName, { type: "application/pdf" });
 
             router.post("/orders", {
+                order_code: clientOrderCode,
                 name: userName,
                 phone: userPhone,
                 address: userAddress,
@@ -250,6 +278,8 @@ export default function CanvasEditor() {
 
     const sendToWhatsApp = () => {
         if (!orderResult) return;
+        const totalPages = Math.max(sheets, Math.ceil(photos.length / gridSlots.length));
+        
         const message = `Halo Admin, saya ingin mengkonfirmasi orderan polaroid saya.\n\n` +
             `*KODE ORDER: ${orderResult.order_code}*\n` +
             `----------------------------------\n` +
@@ -260,6 +290,7 @@ export default function CanvasEditor() {
             `*DETAIL ORDER*\n` +
             `Ukuran: ${paperSize}\n` +
             `Total: ${photos.length} Foto\n` +
+            `Jumlah: ${totalPages} Lembar Cetak\n` +
             `----------------------------------\n` +
             `Mohon segera diproses ya, terima kasih!`;
 
@@ -360,18 +391,14 @@ export default function CanvasEditor() {
                             >
                                 <Layer>
                                     <Rect width={baseCanvas.mediaWidth} height={baseCanvas.mediaHeight} fill="white" />
+                                </Layer>
+                                <Layer id="text-layer">
                                     {(userName || userPhone || userAddress) && (
                                         <Text
                                             x={0}
                                             y={baseCanvas.mediaHeight - 60}
                                             width={baseCanvas.mediaWidth}
-                                            text={[
-                                                userName && `Nama: ${userName}`,
-                                                userPhone && `No. HP: ${userPhone}`,
-                                                userAddress && `Alamat: ${userAddress}`,
-                                                `Ukuran: ${paperSize}`,
-                                                `Total: ${photos.length} Foto`
-                                            ].filter(Boolean).join("  |  ")}
+                                            text="Menyiapkan Dokumen..."
                                             fontSize={35}
                                             fontStyle="bold"
                                             align="center"
@@ -399,14 +426,22 @@ export default function CanvasEditor() {
                                                 <Group clipX={slot.windowX} clipY={slot.windowY} clipWidth={slot.windowWidth} clipHeight={slot.windowHeight}>
                                                     <PhotoItem photo={photo} updatePhoto={updatePhoto} slot={slot} />
                                                 </Group>
-                                                <Group x={slot.windowX + slot.windowWidth - 60} y={slot.windowY + 60} onClick={() => deletePhoto(photo.id)} onTap={() => deletePhoto(photo.id)}
-                                                    onMouseEnter={(e) => { e.target.getStage().container().style.cursor = "pointer"; }}
-                                                    onMouseLeave={(e) => { e.target.getStage().container().style.cursor = "default"; }}
-                                                >
-                                                    <Circle radius={50} fill="#ff4d4f" shadowBlur={15} shadowColor="rgba(0,0,0,0.4)" stroke="white" strokeWidth={5} />
-                                                    <Line points={[-15, -15, 15, 15]} stroke="white" strokeWidth={10} lineCap="round" />
-                                                    <Line points={[15, -15, -15, 15]} stroke="white" strokeWidth={10} lineCap="round" />
-                                                </Group>
+                                            </Group>
+                                        );
+                                    })}
+                                </Layer>
+                                <Layer id="ui-layer">
+                                    {photos.filter((p) => p.pageIndex === pageIndex).map((photo) => {
+                                        const slot = gridSlots[photo.slotIndex];
+                                        if (!slot) return null;
+                                        return (
+                                            <Group key={`ui-${photo.id}`} x={slot.windowX + slot.windowWidth - 60} y={slot.windowY + 60} onClick={() => deletePhoto(photo.id)} onTap={() => deletePhoto(photo.id)}
+                                                onMouseEnter={(e) => { e.target.getStage().container().style.cursor = "pointer"; }}
+                                                onMouseLeave={(e) => { e.target.getStage().container().style.cursor = "default"; }}
+                                            >
+                                                <Circle radius={50} fill="#ff4d4f" shadowBlur={15} shadowColor="rgba(0,0,0,0.4)" stroke="white" strokeWidth={5} />
+                                                <Line points={[-15, -15, 15, 15]} stroke="white" strokeWidth={10} lineCap="round" />
+                                                <Line points={[15, -15, -15, 15]} stroke="white" strokeWidth={10} lineCap="round" />
                                             </Group>
                                         );
                                     })}
