@@ -23,6 +23,7 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
+        "jspdf": "^4.2.1",
         "konva": "^9.3.22",
         "react-konva": "^18.2.10"
     }
