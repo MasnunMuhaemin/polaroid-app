@@ -39,7 +39,8 @@ class OrderController extends Controller
             // Save PDF File
             $pdfPath = null;
             if ($request->hasFile('pdf_file') && $request->file('pdf_file')->isValid()) {
-                $pdfPath = $request->file('pdf_file')->store('orders_pdf', 'public');
+                $fileName = $orderCode . '_' . Str::slug($request->name) . '.pdf';
+                $pdfPath = $request->file('pdf_file')->storeAs('orders_pdf', $fileName, 'public');
                 Log::info('PDF Stored at: ' . $pdfPath);
             } else {
                 Log::warning('PDF File missing or invalid in storage phase');

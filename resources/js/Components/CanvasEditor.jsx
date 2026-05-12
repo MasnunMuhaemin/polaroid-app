@@ -30,7 +30,7 @@ export default function CanvasEditor() {
     const [mode, setMode] = useState("polaroid");
     const [paperSize, setPaperSize] = useState("2R");
     const [photos, setPhotos] = useState([]);
-    const [showGuide, setShowGuide] = useState(true);
+
     const [sheets, setSheets] = useState(1);
     const [userName, setUserName] = useState("");
     const [userPhone, setUserPhone] = useState("");
@@ -76,8 +76,8 @@ export default function CanvasEditor() {
         mediaHeight: isLandscape ? baseMediaWidth : baseMediaHeight,
         safeWidth: isLandscape ? baseSafeHeight : baseSafeWidth,
         safeHeight: isLandscape ? baseSafeWidth : baseSafeHeight,
-        safeX: (isLandscape ? baseMediaHeight - baseSafeHeight : baseMediaWidth - baseSafeWidth) / 2,
-        safeY: (isLandscape ? baseMediaWidth - baseSafeWidth : baseMediaHeight - baseSafeHeight) / 2,
+        safeX: Math.floor((isLandscape ? baseMediaHeight - baseSafeHeight : baseMediaWidth - baseSafeWidth) / 2),
+        safeY: Math.floor((isLandscape ? baseMediaWidth - baseSafeWidth : baseMediaHeight - baseSafeHeight) / 2),
     };
 
     const calculateGridSlots = () => {
@@ -87,35 +87,35 @@ export default function CanvasEditor() {
         const rows = Math.floor(baseCanvas.safeHeight / itemHeight);
         const gridWidth = cols * itemWidth;
         const gridHeight = rows * itemHeight;
-        const gridStartX = baseCanvas.safeX + Math.floor((baseCanvas.safeWidth - gridWidth) / 2);
-        const gridStartY = baseCanvas.safeY + Math.floor((baseCanvas.safeHeight - gridHeight) / 2);
+        const gridStartX = Math.floor(baseCanvas.safeX + (baseCanvas.safeWidth - gridWidth) / 2);
+        const gridStartY = Math.floor(baseCanvas.safeY + (baseCanvas.safeHeight - gridHeight) / 2);
         const totalSlots = cols * rows;
         const slots = [];
         for (let i = 0; i < totalSlots; i++) {
             const col = i % cols;
             const row = Math.floor(i / cols);
-            const frameX = gridStartX + col * itemWidth;
-            const frameY = gridStartY + row * itemHeight;
+            const frameX = Math.floor(gridStartX + col * itemWidth);
+            const frameY = Math.floor(gridStartY + row * itemHeight);
             const paddingX = activeSize.padTopSide;
             const paddingYTop = activeSize.padTopSide;
             const paddingYBottom = activeSize.padBottom;
             slots.push({
                 frameX, frameY, frameWidth: itemWidth, frameHeight: itemHeight,
-                windowX: frameX + paddingX,
-                windowY: frameY + paddingYTop,
-                windowWidth: itemWidth - paddingX * 2,
-                windowHeight: itemHeight - (paddingYTop + paddingYBottom),
+                windowX: Math.floor(frameX + paddingX),
+                windowY: Math.floor(frameY + paddingYTop),
+                windowWidth: Math.floor(itemWidth - paddingX * 2),
+                windowHeight: Math.floor(itemHeight - (paddingYTop + paddingYBottom)),
             });
         }
         const cropMarks = [];
-        const markLength = 30;
+        const markLength = 16;
         for (let i = 0; i <= cols; i++) {
-            const x = gridStartX + i * itemWidth;
+            const x = Math.floor(gridStartX + i * itemWidth);
             cropMarks.push({ points: [x, baseCanvas.safeY, x, baseCanvas.safeY - markLength] });
             cropMarks.push({ points: [x, baseCanvas.safeY + baseCanvas.safeHeight, x, baseCanvas.safeY + baseCanvas.safeHeight + markLength] });
         }
         for (let j = 0; j <= rows; j++) {
-            const y = gridStartY + j * itemHeight;
+            const y = Math.floor(gridStartY + j * itemHeight);
             cropMarks.push({ points: [baseCanvas.safeX, y, baseCanvas.safeX - markLength, y] });
             cropMarks.push({ points: [baseCanvas.safeX + baseCanvas.safeWidth, y, baseCanvas.safeX + baseCanvas.safeWidth + markLength, y] });
         }
@@ -210,7 +210,7 @@ export default function CanvasEditor() {
                 const stage = stageRefs.current[i];
                 if (!stage) continue;
                 
-                const guideLayer = stage.findOne("#guide-layer");
+
                 const uiLayer = stage.findOne("#ui-layer");
                 const textLayer = stage.findOne("#text-layer");
                 
@@ -227,19 +227,19 @@ export default function CanvasEditor() {
                     }
                 }
 
-                if (guideLayer) guideLayer.hide();
+
                 if (uiLayer) uiLayer.hide();
                 
                 stage.draw();
                 // Increase pixelRatio to 4 for ultra-high resolution printing
                 const uri = stage.toDataURL({ pixelRatio: 4 }); 
                 
-                if (guideLayer) guideLayer.show();
+
                 if (uiLayer) uiLayer.show();
                 
                 stage.draw();
                 if (i > 0) pdf.addPage();
-                pdf.addImage(uri, "PNG", 0, 0, baseCanvas.mediaWidth / 10, baseCanvas.mediaHeight / 10, undefined, 'FAST');
+                pdf.addImage(uri, "PNG", 0, 0, baseCanvas.mediaWidth / 10, baseCanvas.mediaHeight / 10);
             }
 
             const fileName = `${clientOrderCode}_${userName.replace(/\s+/g, "_") || "Pelanggan"}.pdf`;
@@ -365,7 +365,7 @@ export default function CanvasEditor() {
                 mode={mode} setMode={setMode}
                 paperSize={paperSize} setPaperSize={handlePaperSizeChange}
                 handleUpload={handleUpload}
-                showGuide={showGuide} setShowGuide={setShowGuide}
+
                 sheets={sheets} setSheets={setSheets}
                 capacity={gridSlots.length}
                 userName={userName} setUserName={setUserName}
@@ -407,14 +407,42 @@ export default function CanvasEditor() {
                                     )}
                                 </Layer>
                                 <Layer id="frame-layer">
-                                    {gridSlots.map((slot, idx) => (
-                                        <Group key={idx}>
-                                            <Rect x={slot.frameX} y={slot.frameY} width={slot.frameWidth} height={slot.frameHeight} fill="white" stroke="#cccccc" strokeWidth={1} listening={false} />
-                                            <Rect x={slot.windowX} y={slot.windowY} width={slot.windowWidth} height={slot.windowHeight} stroke="rgba(0,0,0,0.05)" strokeWidth={4} listening={false} />
-                                        </Group>
-                                    ))}
+                                    {gridSlots.map((slot, idx) => {
+                                        const crossLength = 16; // 1.6mm cross length
+                                        const x = slot.frameX;
+                                        const y = slot.frameY;
+                                        const w = slot.frameWidth;
+                                        const h = slot.frameHeight;
+                                        
+                                        return (
+                                            <Group key={idx}>
+                                                {/* Frame Base without stroke */}
+                                                <Rect x={x} y={y} width={w} height={h} fill="white" listening={false} />
+                                                
+                                                {/* Window stroke (inner area) */}
+                                                <Rect x={slot.windowX} y={slot.windowY} width={slot.windowWidth} height={slot.windowHeight} stroke="rgba(0,0,0,0.03)" strokeWidth={0.5} listening={false} />
+
+                                                {/* Crosshair Crop Marks (+) at each corner with 0.5 offset for sharp lines */}
+                                                {/* Top Left */}
+                                                <Line points={[x - crossLength, y + 0.5, x + crossLength, y + 0.5]} stroke="#000000" strokeWidth={1} listening={false} />
+                                                <Line points={[x + 0.5, y - crossLength, x + 0.5, y + crossLength]} stroke="#000000" strokeWidth={1} listening={false} />
+                                                
+                                                {/* Top Right */}
+                                                <Line points={[x + w - crossLength, y + 0.5, x + w + crossLength, y + 0.5]} stroke="#000000" strokeWidth={1} listening={false} />
+                                                <Line points={[x + w + 0.5, y - crossLength, x + w + 0.5, y + crossLength]} stroke="#000000" strokeWidth={1} listening={false} />
+                                                
+                                                {/* Bottom Left */}
+                                                <Line points={[x - crossLength, y + h + 0.5, x + crossLength, y + h + 0.5]} stroke="#000000" strokeWidth={1} listening={false} />
+                                                <Line points={[x + 0.5, y + h - crossLength, x + 0.5, y + h + crossLength]} stroke="#000000" strokeWidth={1} listening={false} />
+                                                
+                                                {/* Bottom Right */}
+                                                <Line points={[x + w - crossLength, y + h + 0.5, x + w + crossLength, y + h + 0.5]} stroke="#000000" strokeWidth={1} listening={false} />
+                                                <Line points={[x + w + 0.5, y + h - crossLength, x + w + 0.5, y + h + crossLength]} stroke="#000000" strokeWidth={1} listening={false} />
+                                            </Group>
+                                        );
+                                    })}
                                     {cropMarks.map((mark, idx) => (
-                                        <Line key={`crop-${idx}`} points={mark.points} stroke="black" strokeWidth={2} listening={false} />
+                                        <Line key={`crop-${idx}`} points={[mark.points[0] + 0.5, mark.points[1] + 0.5, mark.points[2] + 0.5, mark.points[3] + 0.5]} stroke="#000000" strokeWidth={1} listening={false} />
                                     ))}
                                 </Layer>
                                 <Layer id="photo-layer">
@@ -446,10 +474,7 @@ export default function CanvasEditor() {
                                         );
                                     })}
                                 </Layer>
-                                <Layer id="guide-layer" visible={showGuide}>
-                                    <Rect x={0} y={0} width={baseCanvas.mediaWidth} height={baseCanvas.mediaHeight} stroke="red" strokeWidth={10} dash={[40, 40]} listening={false} />
-                                    <Rect x={baseCanvas.safeX} y={baseCanvas.safeY} width={baseCanvas.safeWidth} height={baseCanvas.safeHeight} stroke="green" strokeWidth={10} dash={[40, 40]} listening={false} />
-                                </Layer>
+
                             </Stage>
                         </div>
                     </div>

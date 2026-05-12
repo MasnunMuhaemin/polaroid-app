@@ -4,8 +4,7 @@ export default function Toolbar({
     paperSize,
     setPaperSize,
     handleUpload,
-    showGuide,
-    setShowGuide,
+
     sheets,
     setSheets,
     capacity,
