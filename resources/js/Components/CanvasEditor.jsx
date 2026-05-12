@@ -31,6 +31,48 @@ export default function CanvasEditor() {
     const [paperSize, setPaperSize] = useState("2R");
     const [photos, setPhotos] = useState([]);
 
+    const [frameType, setFrameType] = useState("klasik");
+    const [frameColor, setFrameColor] = useState("putih");
+
+    useEffect(() => {
+        if (frameType === "full") {
+            setFrameColor("putih");
+        }
+
+        // Recalculate photos when frameType or paperSize changes
+        setPhotos((prev) => {
+            return prev.map((photo, index) => {
+                // Re-calculate pagination based on new grid capacity
+                const pageIndex = Math.floor(index / gridSlots.length);
+                const slotIndex = index % gridSlots.length;
+                const slot = gridSlots[slotIndex];
+                
+                if (!slot) return photo;
+
+                const newScale = Math.max(slot.windowWidth / photo.width, slot.windowHeight / photo.height);
+                
+                // If current scale is smaller than new required min scale, update it
+                const finalScale = Math.max(photo.scaleX, newScale);
+                
+                // Centering by default if slot changed, or keeping relative position?
+                // Let's just center it for simplicity when slot changes significantly
+                let newX = slot.windowX + (slot.windowWidth - photo.width * finalScale) / 2;
+                let newY = slot.windowY + (slot.windowHeight - photo.height * finalScale) / 2;
+
+                return {
+                    ...photo,
+                    pageIndex,
+                    slotIndex,
+                    scaleX: finalScale,
+                    scaleY: finalScale,
+                    minScale: newScale,
+                    x: newX,
+                    y: newY,
+                };
+            });
+        });
+    }, [frameType, paperSize]);
+
     const [sheets, setSheets] = useState(1);
     const [userName, setUserName] = useState("");
     const [userPhone, setUserPhone] = useState("");
@@ -96,9 +138,17 @@ export default function CanvasEditor() {
             const row = Math.floor(i / cols);
             const frameX = Math.floor(gridStartX + col * itemWidth);
             const frameY = Math.floor(gridStartY + row * itemHeight);
-            const paddingX = activeSize.padTopSide;
-            const paddingYTop = activeSize.padTopSide;
-            const paddingYBottom = activeSize.padBottom;
+            let paddingX = activeSize.padTopSide;
+            let paddingYTop = activeSize.padTopSide;
+            let paddingYBottom = activeSize.padBottom;
+
+            if (frameType === "simpel") {
+                paddingYBottom = paddingYTop;
+            } else if (frameType === "full") {
+                paddingX = 0;
+                paddingYTop = 0;
+                paddingYBottom = 0;
+            }
             slots.push({
                 frameX, frameY, frameWidth: itemWidth, frameHeight: itemHeight,
                 windowX: Math.floor(frameX + paddingX),
@@ -188,7 +238,6 @@ export default function CanvasEditor() {
 
     const handlePaperSizeChange = (newSize) => {
         setPaperSize(newSize);
-        setPhotos([]);
     };
 
     const saveOrder = async () => {
@@ -252,6 +301,8 @@ export default function CanvasEditor() {
                 phone: userPhone,
                 address: userAddress,
                 paper_size: paperSize,
+                frame_type: frameType,
+                frame_color: frameColor,
                 mode: mode,
                 pdf_file: pdfFile,
                 layout_json: JSON.stringify(photos.map(p => ({ id: p.id, x: p.x, y: p.y }))),
@@ -289,6 +340,8 @@ export default function CanvasEditor() {
             `Alamat: ${userAddress}\n\n` +
             `*DETAIL ORDER*\n` +
             `Ukuran: ${paperSize}\n` +
+            `Tipe Frame: ${frameType.toUpperCase()}\n` +
+            `Warna Dasar: ${frameColor.toUpperCase()}\n` +
             `Total: ${photos.length} Foto\n` +
             `Jumlah: ${totalPages} Lembar Cetak\n` +
             `----------------------------------\n` +
@@ -366,6 +419,8 @@ export default function CanvasEditor() {
                 paperSize={paperSize} setPaperSize={handlePaperSizeChange}
                 handleUpload={handleUpload}
 
+                frameType={frameType} setFrameType={setFrameType}
+                frameColor={frameColor} setFrameColor={setFrameColor}
                 sheets={sheets} setSheets={setSheets}
                 capacity={gridSlots.length}
                 userName={userName} setUserName={setUserName}
@@ -392,20 +447,7 @@ export default function CanvasEditor() {
                                 <Layer>
                                     <Rect width={baseCanvas.mediaWidth} height={baseCanvas.mediaHeight} fill="white" />
                                 </Layer>
-                                <Layer id="text-layer">
-                                    {(userName || userPhone || userAddress) && (
-                                        <Text
-                                            x={0}
-                                            y={baseCanvas.mediaHeight - 60}
-                                            width={baseCanvas.mediaWidth}
-                                            text="Menyiapkan Dokumen..."
-                                            fontSize={35}
-                                            fontStyle="bold"
-                                            align="center"
-                                            fill="#444444"
-                                        />
-                                    )}
-                                </Layer>
+
                                 <Layer id="frame-layer">
                                     {gridSlots.map((slot, idx) => {
                                         const crossLength = 16; // 1.6mm cross length
@@ -417,10 +459,10 @@ export default function CanvasEditor() {
                                         return (
                                             <Group key={idx}>
                                                 {/* Frame Base without stroke */}
-                                                <Rect x={x} y={y} width={w} height={h} fill="white" listening={false} />
+                                                <Rect x={x} y={y} width={w} height={h} fill={frameColor === "hitam" ? "#1a1a1a" : "white"} listening={false} />
                                                 
                                                 {/* Window stroke (inner area) */}
-                                                <Rect x={slot.windowX} y={slot.windowY} width={slot.windowWidth} height={slot.windowHeight} stroke="rgba(0,0,0,0.03)" strokeWidth={0.5} listening={false} />
+                                                <Rect x={slot.windowX} y={slot.windowY} width={slot.windowWidth} height={slot.windowHeight} stroke={frameColor === "hitam" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.03)"} strokeWidth={0.5} listening={false} />
 
                                                 {/* Crosshair Crop Marks (+) at each corner with 0.5 offset for sharp lines */}
                                                 {/* Top Left */}
@@ -457,6 +499,20 @@ export default function CanvasEditor() {
                                             </Group>
                                         );
                                     })}
+                                </Layer>
+                                <Layer id="text-layer">
+                                    {(userName || userPhone || userAddress) && (
+                                        <Text
+                                            x={0}
+                                            y={baseCanvas.mediaHeight - 60}
+                                            width={baseCanvas.mediaWidth}
+                                            text="Menyiapkan Dokumen..."
+                                            fontSize={35}
+                                            fontStyle="bold"
+                                            align="center"
+                                            fill="#444444"
+                                        />
+                                    )}
                                 </Layer>
                                 <Layer id="ui-layer">
                                     {photos.filter((p) => p.pageIndex === pageIndex).map((photo) => {

@@ -17,6 +17,8 @@ class OrderInfolist
                 TextEntry::make('address')
                     ->columnSpanFull(),
                 TextEntry::make('paper_size'),
+                TextEntry::make('frame_type'),
+                TextEntry::make('frame_color'),
                 TextEntry::make('mode'),
                 TextEntry::make('layout_json')
                     ->columnSpanFull(),

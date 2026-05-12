@@ -24,6 +24,8 @@ class OrderController extends Controller
                 'phone' => 'required|string',
                 'address' => 'required|string',
                 'paper_size' => 'required|string',
+                'frame_type' => 'required|string',
+                'frame_color' => 'required|string',
                 'mode' => 'required|string',
                 'layout_json' => 'required|string',
                 'pdf_file' => 'required|file|mimes:pdf|max:51200', // Max 50MB
@@ -52,6 +54,8 @@ class OrderController extends Controller
                 'phone' => $request->phone,
                 'address' => $request->address,
                 'paper_size' => $request->paper_size,
+                'frame_type' => $request->frame_type,
+                'frame_color' => $request->frame_color,
                 'mode' => $request->mode,
                 'layout_json' => $request->layout_json,
                 'pdf_path' => $pdfPath,

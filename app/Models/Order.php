@@ -12,6 +12,8 @@ class Order extends Model
         'phone',
         'address',
         'paper_size',
+        'frame_type',
+        'frame_color',
         'mode',
         'layout_json',
         'pdf_path',

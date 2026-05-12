@@ -24,6 +24,10 @@ class OrderForm
                     ->columnSpanFull(),
                 TextInput::make('paper_size')
                     ->required(),
+                TextInput::make('frame_type')
+                    ->required(),
+                TextInput::make('frame_color')
+                    ->required(),
                 TextInput::make('mode')
                     ->required(),
                 Textarea::make('layout_json')

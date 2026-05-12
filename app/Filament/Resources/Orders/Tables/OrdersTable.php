@@ -36,6 +36,16 @@ class OrdersTable
                     ->badge()
                     ->color('info')
                     ->searchable(),
+                TextColumn::make('frame_type')
+                    ->label('Tipe Frame')
+                    ->badge()
+                    ->color('gray')
+                    ->formatStateUsing(fn (string $state): string => ucfirst($state)),
+                TextColumn::make('frame_color')
+                    ->label('Warna Dasar')
+                    ->badge()
+                    ->color(fn (string $state): string => $state === 'hitam' ? 'gray' : 'info')
+                    ->formatStateUsing(fn (string $state): string => ucfirst($state)),
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {

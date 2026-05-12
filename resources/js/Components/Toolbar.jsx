@@ -5,6 +5,10 @@ export default function Toolbar({
     setPaperSize,
     handleUpload,
 
+    frameType,
+    setFrameType,
+    frameColor,
+    setFrameColor,
     sheets,
     setSheets,
     capacity,
@@ -99,6 +103,37 @@ export default function Toolbar({
                             <option value="Poster">Poster (31 x 37 cm)</option>
                         </select>
                     </div>
+
+                    <div className="flex flex-col gap-1">
+                        <span className="text-[9px] font-bold text-gray-400 uppercase">Tipe Frame</span>
+                        <select
+                            value={frameType}
+                            onChange={(e) => setFrameType(e.target.value)}
+                            className="border border-gray-200 p-2 rounded-lg text-sm font-bold bg-gray-50 focus:border-indigo-500"
+                        >
+                            <option value="klasik">Klasik</option>
+                            <option value="simpel">Simpel</option>
+                            <option value="full">Full</option>
+                        </select>
+                    </div>
+
+                    {frameType !== "full" && (
+                        <div className="flex flex-col gap-1">
+                            <span className="text-[9px] font-bold text-gray-400 uppercase">Warna Dasar</span>
+                            <div className="flex items-center gap-2 p-1.5 bg-gray-50 rounded-lg border border-gray-100">
+                                <button
+                                    onClick={() => setFrameColor("putih")}
+                                    className={`w-6 h-6 rounded-md border transition-all ${frameColor === "putih" ? "ring-2 ring-indigo-500 border-white bg-white" : "border-gray-200 bg-white"}`}
+                                    title="Putih"
+                                />
+                                <button
+                                    onClick={() => setFrameColor("hitam")}
+                                    className={`w-6 h-6 rounded-md border transition-all ${frameColor === "hitam" ? "ring-2 ring-indigo-500 border-gray-600 bg-gray-900" : "border-gray-200 bg-gray-900"}`}
+                                    title="Hitam"
+                                />
+                            </div>
+                        </div>
+                    )}
 
                     <div className="flex flex-col gap-1">
                         <span className="text-[9px] font-bold text-gray-400 uppercase">Target Foto</span>
