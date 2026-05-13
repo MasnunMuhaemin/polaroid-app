@@ -445,7 +445,7 @@ export default function CanvasEditor() {
                                 ref={(el) => (stageRefs.current[pageIndex] = el)}
                             >
                                 <Layer>
-                                    <Rect width={baseCanvas.mediaWidth} height={baseCanvas.mediaHeight} fill="white" />
+                                    <Rect width={baseCanvas.mediaWidth} height={baseCanvas.mediaHeight} fill={frameColor === "hitam" ? "black" : "white"} />
                                 </Layer>
 
                                 <Layer id="frame-layer">
@@ -459,32 +459,32 @@ export default function CanvasEditor() {
                                         return (
                                             <Group key={idx}>
                                                 {/* Frame Base without stroke */}
-                                                <Rect x={x} y={y} width={w} height={h} fill={frameColor === "hitam" ? "#1a1a1a" : "white"} listening={false} />
+                                                <Rect x={x} y={y} width={w} height={h} fill={frameColor === "hitam" ? "black" : "white"} listening={false} />
                                                 
-                                                {/* Window stroke (inner area) */}
-                                                <Rect x={slot.windowX} y={slot.windowY} width={slot.windowWidth} height={slot.windowHeight} stroke={frameColor === "hitam" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.03)"} strokeWidth={0.5} listening={false} />
+                                                {/* Window stroke (inner area) - Grey if black base */}
+                                                <Rect x={slot.windowX} y={slot.windowY} width={slot.windowWidth} height={slot.windowHeight} stroke={frameColor === "hitam" ? "#333333" : "rgba(0,0,0,0.03)"} strokeWidth={0.5} listening={false} />
 
-                                                {/* Crosshair Crop Marks (+) at each corner with 0.5 offset for sharp lines */}
+                                                {/* Crosshair Crop Marks (+) at each corner - White if black base */}
                                                 {/* Top Left */}
-                                                <Line points={[x - crossLength, y + 0.5, x + crossLength, y + 0.5]} stroke="#000000" strokeWidth={1} listening={false} />
-                                                <Line points={[x + 0.5, y - crossLength, x + 0.5, y + crossLength]} stroke="#000000" strokeWidth={1} listening={false} />
+                                                <Line points={[x - crossLength, y + 0.5, x + crossLength, y + 0.5]} stroke={frameColor === "hitam" ? "white" : "black"} strokeWidth={1} listening={false} />
+                                                <Line points={[x + 0.5, y - crossLength, x + 0.5, y + crossLength]} stroke={frameColor === "hitam" ? "white" : "black"} strokeWidth={1} listening={false} />
                                                 
                                                 {/* Top Right */}
-                                                <Line points={[x + w - crossLength, y + 0.5, x + w + crossLength, y + 0.5]} stroke="#000000" strokeWidth={1} listening={false} />
-                                                <Line points={[x + w + 0.5, y - crossLength, x + w + 0.5, y + crossLength]} stroke="#000000" strokeWidth={1} listening={false} />
+                                                <Line points={[x + w - crossLength, y + 0.5, x + w + crossLength, y + 0.5]} stroke={frameColor === "hitam" ? "white" : "black"} strokeWidth={1} listening={false} />
+                                                <Line points={[x + w + 0.5, y - crossLength, x + w + 0.5, y + crossLength]} stroke={frameColor === "hitam" ? "white" : "black"} strokeWidth={1} listening={false} />
                                                 
                                                 {/* Bottom Left */}
-                                                <Line points={[x - crossLength, y + h + 0.5, x + crossLength, y + h + 0.5]} stroke="#000000" strokeWidth={1} listening={false} />
-                                                <Line points={[x + 0.5, y + h - crossLength, x + 0.5, y + h + crossLength]} stroke="#000000" strokeWidth={1} listening={false} />
+                                                <Line points={[x - crossLength, y + h + 0.5, x + crossLength, y + h + 0.5]} stroke={frameColor === "hitam" ? "white" : "black"} strokeWidth={1} listening={false} />
+                                                <Line points={[x + 0.5, y + h - crossLength, x + 0.5, y + h + crossLength]} stroke={frameColor === "hitam" ? "white" : "black"} strokeWidth={1} listening={false} />
                                                 
                                                 {/* Bottom Right */}
-                                                <Line points={[x + w - crossLength, y + h + 0.5, x + w + crossLength, y + h + 0.5]} stroke="#000000" strokeWidth={1} listening={false} />
-                                                <Line points={[x + w + 0.5, y + h - crossLength, x + w + 0.5, y + h + crossLength]} stroke="#000000" strokeWidth={1} listening={false} />
+                                                <Line points={[x + w - crossLength, y + h + 0.5, x + w + crossLength, y + h + 0.5]} stroke={frameColor === "hitam" ? "white" : "black"} strokeWidth={1} listening={false} />
+                                                <Line points={[x + w + 0.5, y + h - crossLength, x + w + 0.5, y + h + crossLength]} stroke={frameColor === "hitam" ? "white" : "black"} strokeWidth={1} listening={false} />
                                             </Group>
                                         );
                                     })}
                                     {cropMarks.map((mark, idx) => (
-                                        <Line key={`crop-${idx}`} points={[mark.points[0] + 0.5, mark.points[1] + 0.5, mark.points[2] + 0.5, mark.points[3] + 0.5]} stroke="#000000" strokeWidth={1} listening={false} />
+                                        <Line key={`crop-${idx}`} points={[mark.points[0] + 0.5, mark.points[1] + 0.5, mark.points[2] + 0.5, mark.points[3] + 0.5]} stroke={frameColor === "hitam" ? "white" : "black"} strokeWidth={1} listening={false} />
                                     ))}
                                 </Layer>
                                 <Layer id="photo-layer">
@@ -510,7 +510,7 @@ export default function CanvasEditor() {
                                             fontSize={35}
                                             fontStyle="bold"
                                             align="center"
-                                            fill="#444444"
+                                            fill={frameColor === "hitam" ? "#888888" : "#444444"}
                                         />
                                     )}
                                 </Layer>
