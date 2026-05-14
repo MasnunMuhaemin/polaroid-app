@@ -1,8 +1,8 @@
 export default function Testimonials() {
     return (
         <section className="py-24 bg-[#FDF8F3]">
-            <div className="max-w-7xl mx-auto px-6 text-center">
-                <h2 className="text-4xl font-black font-outfit uppercase tracking-tight mb-16">
+            <div className="max-w-[1440px] mx-auto px-6 text-center">
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-black font-outfit uppercase tracking-tight mb-8 md:mb-12 lg:mb-16">
                     APA KATA MEREKA? <span className="text-[#E57373]">❤️</span>
                 </h2>
                 
@@ -12,7 +12,7 @@ export default function Testimonials() {
                         { name: "Dimas W.", text: "Prosesnya mudah and cepat. Pesan hari ini, dua hari kemudian sudah sampai. Puas banget!", stars: 5 },
                         { name: "Rani S.", text: "Cetak foto di sini jadi langganan! Kualitas top, harga bersahabat, recommended!", stars: 5 }
                     ].map((testi, idx) => (
-                        <div key={idx} className="bg-white p-10 rounded-[40px] shadow-xl border border-white text-left relative group hover:bg-[#E57373] transition-all duration-500">
+                        <div key={idx} className="bg-white p-6 md:p-8 lg:p-10 rounded-[32px] md:rounded-[40px] shadow-xl border border-white text-left relative group hover:bg-[#E57373] transition-all duration-500">
                             <div className="flex gap-1 mb-6">
                                 {[...Array(testi.stars)].map((_, i) => (
                                     <span key={i} className="text-[#E57373] group-hover:text-white transition-colors text-xl">★</span>

@@ -27,7 +27,7 @@ const sizes = [
 export default function Sizes() {
     return (
         <section id="sizes" className="py-20 bg-[#FDF8F3]">
-            <div className="max-w-7xl mx-auto px-6">
+            <div className="max-w-[1440px] mx-auto px-6">
                 <div className="flex flex-col lg:flex-row items-center gap-16">
 
                     {/* LEFT: Text */}
@@ -35,7 +35,7 @@ export default function Sizes() {
                         <span className="text-[10px] font-black text-[#E57373] uppercase tracking-[0.3em] mb-4 block">
                             UKURAN FAVORIT ❤️
                         </span>
-                        <h2 className="text-3xl md:text-4xl font-black font-outfit leading-tight mb-4">
+                        <h2 className="text-2xl md:text-3xl lg:text-4xl font-black font-outfit leading-tight mb-4">
                             Pilihan Ukuran Untuk Setiap Momen
                         </h2>
                         <p className="text-gray-500 text-sm font-medium leading-relaxed mb-8">
@@ -43,7 +43,7 @@ export default function Sizes() {
                         </p>
                         <Link
                             href={route('editor')}
-                            className="inline-flex items-center gap-2 px-7 py-3.5 bg-[#E57373] text-white rounded-full font-black text-sm uppercase tracking-wider hover:bg-[#D32F2F] transition-all shadow-lg shadow-red-200 active:scale-95"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 md:px-7 md:py-3.5 bg-[#E57373] text-white rounded-full font-black text-[10px] md:text-sm uppercase tracking-wider hover:bg-[#D32F2F] transition-all shadow-lg shadow-red-200 active:scale-95"
                         >
                             Lihat Semua Ukuran
                         </Link>

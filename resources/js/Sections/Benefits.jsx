@@ -40,7 +40,7 @@ export default function Benefits() {
 
     return (
         <section id="benefits" className="py-24 bg-[#FDFBF8] relative overflow-hidden">
-            <div className="max-w-7xl mx-auto px-6 lg:pr-64">
+            <div className="max-w-[1440px] mx-auto px-6 lg:pr-64">
                 <div className="grid grid-cols-1 lg:grid-cols-10 gap-12 items-center">
                     
                     {/* LEFT: Heading & Description */}
@@ -48,8 +48,8 @@ export default function Benefits() {
                         <span className="text-xs font-black text-[#E57373] uppercase tracking-[0.3em] mb-4 block">
                             KENAPA PILIH KAMI? ❤️
                         </span>
-                        <h2 className="text-4xl md:text-5xl font-black font-outfit leading-tight mb-8">
-                            Lebih Dari Sekadar <br />
+                        <h2 className="text-2xl md:text-4xl lg:text-5xl font-black font-outfit leading-tight mb-6">
+                            Lebih Dari Sekadar <br className="hidden md:block" />
                             Cetak Foto
                         </h2>
                         <p className="text-gray-500 text-sm md:text-base font-medium leading-relaxed max-w-sm mx-auto lg:mx-0">
@@ -66,10 +66,10 @@ export default function Benefits() {
                                         {benefit.icon}
                                     </div>
                                     <div>
-                                        <h4 className="font-black text-lg uppercase tracking-wide mb-2 text-gray-800">
+                                        <h4 className="font-black text-base md:text-lg uppercase tracking-wide mb-2 text-gray-800">
                                             {benefit.title}
                                         </h4>
-                                        <p className="text-xs md:text-sm text-gray-400 font-medium leading-relaxed">
+                                        <p className="text-[10px] md:text-sm text-gray-400 font-medium leading-relaxed">
                                             {benefit.desc}
                                         </p>
                                     </div>

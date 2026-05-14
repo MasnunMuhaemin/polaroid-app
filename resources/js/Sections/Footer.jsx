@@ -1,9 +1,9 @@
 export default function Footer() {
     return (
-        <footer className="bg-[#FDFBF8] pt-24 pb-12">
-            <div className="max-w-7xl mx-auto px-6">
+        <footer className="bg-[#FDFBF8] pt-16 pb-8 md:pt-24 md:pb-12">
+            <div className="max-w-[1440px] mx-auto px-6">
                 {/* Main Content Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-24">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 md:gap-12 mb-12 md:mb-24">
                     
                     {/* Brand & Socials */}
                     <div className="lg:col-span-3">
@@ -38,7 +38,7 @@ export default function Footer() {
 
                     {/* Links Columns */}
                     <div className="lg:col-span-2">
-                        <h4 className="font-black text-[#E57373] text-[10px] uppercase tracking-[0.2em] mb-8">Informasi</h4>
+                        <h4 className="font-black text-[#E57373] text-[10px] uppercase tracking-[0.2em] mb-4 md:mb-8">Informasi</h4>
                         <ul className="flex flex-col gap-4 text-xs font-medium text-gray-500">
                             <li><a href="#" className="hover:text-[#E57373] transition-colors">Tentang Kami</a></li>
                             <li><a href="#" className="hover:text-[#E57373] transition-colors">Cara Order</a></li>
@@ -48,7 +48,7 @@ export default function Footer() {
                     </div>
 
                     <div className="lg:col-span-2">
-                        <h4 className="font-black text-[#E57373] text-[10px] uppercase tracking-[0.2em] mb-8">Bantuan</h4>
+                        <h4 className="font-black text-[#E57373] text-[10px] uppercase tracking-[0.2em] mb-4 md:mb-8">Bantuan</h4>
                         <ul className="flex flex-col gap-4 text-xs font-medium text-gray-500">
                             <li><a href="#" className="hover:text-[#E57373] transition-colors">FAQ</a></li>
                             <li><a href="#" className="hover:text-[#E57373] transition-colors">Pengiriman</a></li>
@@ -59,7 +59,7 @@ export default function Footer() {
 
                     {/* Contact Info */}
                     <div className="lg:col-span-2">
-                        <h4 className="font-black text-[#E57373] text-[10px] uppercase tracking-[0.2em] mb-8">Kontak Kami</h4>
+                        <h4 className="font-black text-[#E57373] text-[10px] uppercase tracking-[0.2em] mb-4 md:mb-8">Kontak Kami</h4>
                         <ul className="flex flex-col gap-6 text-xs font-medium text-gray-500">
                             <li className="flex items-center gap-3">
                                 <svg className="w-4 h-4 text-[#E57373]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,7 +85,7 @@ export default function Footer() {
 
                     {/* Newsletter */}
                     <div className="lg:col-span-3">
-                        <h4 className="font-black text-[#E57373] text-[10px] uppercase tracking-[0.2em] mb-8">Newsletter</h4>
+                        <h4 className="font-black text-[#E57373] text-[10px] uppercase tracking-[0.2em] mb-4 md:mb-8">Newsletter</h4>
                         <p className="text-gray-500 text-xs font-medium mb-6">
                             Dapatkan info promo dan tips menarik seputar fotografi.
                         </p>
