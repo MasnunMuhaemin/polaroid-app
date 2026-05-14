@@ -12,6 +12,7 @@
     @viteReactRefresh
     @vite('resources/js/app.jsx')
 
+    @routes
     @inertiaHead
 
 </head>
